@@ -41,7 +41,7 @@ class SearchBooks extends Component {
      {this.state.listofBooks != null && (
       <ol className="books-grid">
        {this.state.listofBooks.map((book) => (
-        <Book book={book} defaultValue="currentlyReading" key={book.id} getAllBooks={this.getAllBooks} />
+        <Book book={book} defaultValue='none' key={book.id} getAllBooks={this.getAllBooks} />
        ))}
       </ol>
      )}
