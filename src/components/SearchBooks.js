@@ -1,31 +1,54 @@
-import React, {Component} from 'react'
+import React, { Component } from "react";
+import * as BooksAPI from "../BooksAPI";
+import Book from "./Book";
+import { Link } from "react-router-dom";
+class SearchBooks extends Component {
+ constructor() {
+  super();
+  this.state = {
+   listOfBooks: [],
+   searchError: false,
+  };
+ }
 
-class SearchBooks extends Component
-{
+ handleChange = (event) => {
+  const { value } = event.target;
 
-    render(){
-        return (
-          <div className="search-books">
-         <div className="search-books-bar">
-          <button className="close-search" onClick=''>Close</button>
-          <div className="search-books-input-wrapper">
-            {/*
-              NOTES: The search from BooksAPI is limited to a particular set of search terms.
-              You can find these search terms here:
-              https://github.com/udacity/reactnd-project-myreads-starter/blob/master/SEARCH_TERMS.md
-  
-              However, remember that the BooksAPI.search method DOES search by title or author. So, don't worry if
-              you don't find a specific author or title. Every search is limited by search terms.
-            */}
-            <input type="text" placeholder="Search by title or author"/>
-  
-          </div>
-        </div>
-        <div className="search-books-results">
-          <ol className="books-grid"></ol>
-        </div>
-      </div>
-        )
-    }
-    }
-    export default SearchBooks
+  //searchQuery
+  value
+   ? BooksAPI.search(value).then((books) => (books.length > 0 ? this.setState({ listofBooks: books, searchError: false }) : this.setState({ listofBooks: [], searchError: true })))
+   : this.setState({ listofBooks: [], searchError: true });
+ };
+
+ getAllBooks = () => {
+  BooksAPI.getAll().then((response) => {
+   this.setState({ listOfBooks: response });
+  });
+ };
+
+ render() {
+  return (
+   <div className="search-books">
+    <div className="search-books-bar">
+     <Link className="close-search" to="/">
+      Close
+     </Link>
+     <div className="search-books-input-wrapper">
+      <input type="text" name="search" onChange={this.handleChange} placeholder="Search by title or author" />
+     </div>
+    </div>
+    <div className="search-books-results">
+     {this.state.listofBooks != null && (
+      <ol className="books-grid">
+       {this.state.listofBooks.map((book) => (
+        <Book book={book} defaultValue="currentlyReading" key={book.id} getAllBooks={this.getAllBooks} />
+       ))}
+      </ol>
+     )}
+     {this.state.searchError && <h3>Your query did not return any books. Please try again!</h3>}
+    </div>
+   </div>
+  );
+ }
+}
+export default SearchBooks;
