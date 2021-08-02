@@ -1,24 +1,11 @@
 import React, { Component } from "react";
 import Book from "./Book";
-import * as BooksAPI from "../BooksAPI";
 
 class ListBooks extends Component {
  constructor(props) {
   super(props);
-  this.state = {
-   listOfBooks: [],
-  };
+
   this.filterBooksshelves = this.filterBooksshelves.bind(this);
- }
-
- getAllBooks = () => {
-  BooksAPI.getAll().then((response) => {
-   this.setState({ listOfBooks: response });
-  });
- };
-
- componentDidMount() {
-  this.getAllBooks();
  }
 
  filterBooksshelves(listOfBooks, shelf) {
@@ -37,12 +24,9 @@ class ListBooks extends Component {
        <h2 className="bookshelf-title">Currently Reading</h2>
        <div className="bookshelf-books">
         <ol className="books-grid">
-         {
-          //test if not exist
-          this.filterBooksshelves(this.state.listOfBooks, "currentlyReading").map((filteredBook) => (
-           <Book book={filteredBook} defaultValue="currentlyReading" key={filteredBook.id} getAllBooks={this.getAllBooks} />
-          ))
-         }
+         {this.filterBooksshelves(this.props.listOfBooks, "currentlyReading").map((filteredBook) => (
+          <Book book={filteredBook} defaultValue="currentlyReading" key={filteredBook.id} getAllBooks={this.props.getAllBooks} />
+         ))}
         </ol>
        </div>
       </div>
@@ -50,8 +34,8 @@ class ListBooks extends Component {
        <h2 className="bookshelf-title">Want to Read</h2>
        <div className="bookshelf-books">
         <ol className="books-grid">
-         {this.filterBooksshelves(this.state.listOfBooks, "wantToRead").map((filteredBook) => (
-          <Book book={filteredBook} defaultValue="wantToRead" key={filteredBook.id} getAllBooks={this.getAllBooks} />
+         {this.filterBooksshelves(this.props.listOfBooks, "wantToRead").map((filteredBook) => (
+          <Book book={filteredBook} defaultValue="wantToRead" key={filteredBook.id} getAllBooks={this.props.getAllBooks} />
          ))}
         </ol>
        </div>
@@ -60,8 +44,8 @@ class ListBooks extends Component {
        <h2 className="bookshelf-title">Read</h2>
        <div className="bookshelf-books">
         <ol className="books-grid">
-         {this.filterBooksshelves(this.state.listOfBooks, "read").map((filteredBook) => (
-          <Book book={filteredBook} defaultValue="read" key={filteredBook.id} getAllBooks={this.getAllBooks} />
+         {this.filterBooksshelves(this.props.listOfBooks, "read").map((filteredBook) => (
+          <Book book={filteredBook} defaultValue="read" key={filteredBook.id} getAllBooks={this.props.getAllBooks} />
          ))}
         </ol>
        </div>
