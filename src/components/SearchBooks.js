@@ -6,24 +6,44 @@ class SearchBooks extends Component {
  constructor() {
   super();
   this.state = {
-   listOfBooks: [],
+   listOfBooksQuery: [],
    searchError: false,
+   searchInput: "",
   };
  }
 
- handleChange = (event) => {
-  const { value } = event.target;
+ /**
+  *  If the result query contains books on a bookshelf, then update shelf
+  * @param {
+  * } listOfBooksQuery
+  * @param {*} listOfBooks
+  */
+ getShelfDefaultValue = (listOfBooksQuery, listOfBooks) => {
+  let queryResult = listOfBooksQuery.map((bookQuery) => {
+   const queryResult = listOfBooks.find((book) => book.id === bookQuery.id);
+   bookQuery.shelf = queryResult ? queryResult.shelf : "none";
+   return bookQuery;
+  });
 
-  //searchQuery
-  value
-   ? BooksAPI.search(value).then((books) => (books.length > 0 ? this.setState({ listofBooks: books, searchError: false }) : this.setState({ listofBooks: [], searchError: true })))
-   : this.setState({ listofBooks: [], searchError: true });
+  this.setState({ listOfBooksQuery: queryResult });
  };
 
- getAllBooks = () => {
-  BooksAPI.getAll().then((response) => {
-   this.setState({ listOfBooks: response });
-  });
+ handleChange = (event) => {
+  const { value } = event.target;
+  this.setState({ searchInput: value });
+  //searchQuery
+  if (value != null && value.length > 0) {
+   BooksAPI.search(value).then((books) => {
+    if (books.length > 0) {
+     this.setState({ searchError: false });
+     this.getShelfDefaultValue(books, this.props.listOfBooks);
+    } else {
+     this.setState({ listOfBooksQuery: [], searchError: true });
+    }
+   });
+  } else {
+   this.setState({ listOfBooksQuery: [], searchError: false });
+  }
  };
 
  render() {
@@ -38,14 +58,15 @@ class SearchBooks extends Component {
      </div>
     </div>
     <div className="search-books-results">
-     {this.state.listofBooks != null && (
+     {this.state.listOfBooksQuery != null && (
       <ol className="books-grid">
-       {this.state.listofBooks.map((book) => (
-        <Book book={book} defaultValue='none' key={book.id} getAllBooks={this.getAllBooks} />
+       {this.state.listOfBooksQuery.map((book) => (
+        <Book book={book} defaultValue={book.shelf} key={book.id} getAllBooks={this.props.getAllBooks} />
        ))}
       </ol>
      )}
-     {this.state.searchError && <h3>Your query did not return any books. Please try again!</h3>}
+
+     {this.state.searchError && this.state.searchInput.length != null ? <h3>Your query did not return any books. Please try again!</h3> : <div></div>}
     </div>
    </div>
   );
